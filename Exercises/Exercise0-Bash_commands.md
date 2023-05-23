@@ -17,6 +17,9 @@ b) Create the files called
 ```
 
 ---
+mkdir Linux-training
+cd Linux-training  # Change to the "Linux-training" directory
+touch note1.txt note2.txt note3.txt note4.txt  # Create the files
 
 ## 1. Navigating and moving (\*)
 
@@ -37,6 +40,15 @@ g) From here list all files including hidden files
 h) Change name on note3.txt to note_home.txt
 
 ---
+mkdir cool_notes
+mv *.txt cool_notes/
+rm cool_notes/note4.txt
+cd cool_notes 
+ls
+mv note3.txt ../
+cd ..
+ls -a
+mv note3.txt note_home.txt
 
 ## 2. Printing, variables and manipulating text (\*)
 
@@ -64,12 +76,28 @@ h) Count the number of files in cool_notes
 i) Check the disk usage in your directory and make the format human readable
 
 ---
+echo "hello from note_home"
+echo "hello from note_home" > note_home.txt
+echo "current path is: $(pwd)"
+echo -e "current path is: $(pwd)" >> note_home.txt
+cat note_home.txt
+wc -w note_home.txt
+wc -l note_home.txt
+ls -1 cool_notes | wc -l
+du -sh
+
+
 
 ## 3. Pokeventure (\*)
 
 a) Create a folder called data with a subfolder called pokemons
 
+mkdir data
+mkdir data/pokemons
+
 b) Create a file called pokemon_list.txt
+touch data/pokemon_list.txt
+
 
 c) Type in a random list of pokemons, using echo and the bitshift operator
 
@@ -83,6 +111,7 @@ mew
 zapdos
 mewtwo
 ```
+echo -e "pikachu\nvoltorb\nbulbasaur\nmew\nzapdos\nmewtwo" > data/pokemon_list.txt
 
 d) Loop through your file and print out the following
 
@@ -94,10 +123,15 @@ pokemon: mew
 pokemon: zapdos
 pokemon: mewtwo
 ```
+while read -r pokemon; do
+  echo "pokemon: $pokemon"
+done < data/pokemon_list.txt
+
 
 e) Now test out the following api manually in your browser [https://pokeapi.co/api/v2/pokemon-species/voltorb](https://pokeapi.co/api/v2/pokemon-species/voltorb)
 
 f) Now test it out using bash, and see that it prints out the same results
+curl -s https://pokeapi.co/api/v2/pokemon-species/voltorb
 
 g) Do a for loop on pokemon_list.txt, pick the pokemons on the file and request the api. Save each pokemon into their respective json file. Important: add a pause of 2 seconds after each iteration. Your structure should look something like this now.
 
@@ -112,8 +146,25 @@ g) Do a for loop on pokemon_list.txt, pick the pokemons on the file and request 
         ├── voltorb.json
         └── zapdos.json
 ```
+touch pokemon_api.sh
+nano pokemon_api.sh
+
+
+#!/bin/bash
+
+# Read each line from pokemon_list.txt
+while read -r pokemon; do
+  # Make API request for the current Pokémon and save the response to a JSON file
+  curl -s "https://pokeapi.co/api/v2/pokemon-species/$pokemon" -o "data/pokemons/${pokemon}.json"
+  # Pause for 2 seconds before the next iteration
+  sleep 2
+done < data/pokemon_list.txt
+
+
+./pokemon_api.sh
 
 h) Remove all files ending with .json using one command
+rm data/pokemons/*.json
 
 i) Now move yourself to the same level, i.e. sibling to data directory. Create a bash script file called download_pokemons.sh. Put in bash logic for downloading the pokemons specified in data/pokemon/pokemon_list.txt file and saving it into data/pokemons/ and run it. Your file structure might look like this now. (\*\*)
 
